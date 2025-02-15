@@ -1,0 +1,100 @@
+#include <LiquidCrystal_I2C.h>
+
+#include <LiquidCrystal.h>
+#include <Servo.h>
+
+// Inisialisasi LCD
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+
+// Pin sensor infrared
+const int sensorAtasA = A0;
+const int sensorBawahA = A1;
+const int sensorAtasB = A2;
+const int sensorBawahB = A3;
+const int tombolA = A4; // Tombol untuk mengontrol servo
+const int tombolB = A5; // Tombol untuk mengontrol servo
+
+// Variabel counter barang
+int counterA = 0;
+int counterB = 0;
+
+// Inisialisasi servo
+Servo myServo;
+const int servoPin = 5;
+
+void setup() {
+    pinMode(sensorAtasA, INPUT);
+    pinMode(sensorBawahA, INPUT);
+    pinMode(sensorAtasB, INPUT);
+    pinMode(sensorBawahB, INPUT);
+    pinMode(tombolA, INPUT_PULLUP);
+    pinMode(tombolB, INPUT_PULLUP);
+    
+    myServo.attach(servoPin);
+    myServo.write(0); // Posisi awal servo
+
+    lcd.init();
+    lcd.backlight();
+    
+    lcd.begin(16, 2);
+    lcd.setCursor(0, 0);
+    lcd.print("STOCK A: ");
+    lcd.print(counterA);
+    lcd.setCursor(0, 1);
+    lcd.print("STOCK B: ");
+    lcd.print(counterB);
+    
+}
+
+void loop() {
+  if(!counterA <= 0 && !counterB <= 0){
+     counterA = 0;
+     counterB = 0;
+    }
+    if (digitalRead(sensorAtasA) == LOW) { // Barang masuk
+        counterA++;
+        updateLCD();
+        delay(1000); // Debounce
+    }
+    
+    if (digitalRead(sensorBawahA) == LOW) { // Barang keluar
+        counterA--;
+        updateLCD();
+        delay(5000); // Debounce
+    }
+
+    if (digitalRead(sensorAtasB) == LOW) { // Barang masuk
+        counterB++;
+        updateLCD();
+        delay(1000); // Debounce
+    }
+    
+    if (digitalRead(sensorBawahB) == LOW) { // Barang keluar
+        counterB--;
+        updateLCD();
+        delay(5000); // Debounce
+    }
+    
+    if (digitalRead(tombolA) == LOW) { // Tombol ditekan
+        myServo.write(60); // Buka servo 60 derajat
+        delay(1000); // Tunggu sebentar
+        myServo.write(0); // Kembali ke posisi awal
+    }
+    if (digitalRead(tombolB) == LOW) { // Tombol ditekan
+        myServo.write(60); // Buka servo 60 derajat
+        delay(1000); // Tunggu sebentar
+        myServo.write(0); // Kembali ke posisi awal
+    }
+    
+ }
+
+void updateLCD() {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("STOCK A: ");
+    lcd.print(counterA);
+    lcd.setCursor(0, 1);
+    lcd.print("STOCK B: ");
+    lcd.print(counterB);
+}
