@@ -48,9 +48,16 @@ void setup() {
 }
 
 void loop() {
-  if(!counterA <= 0 && !counterB <= 0){
+  if(!counterA < 0 && !counterB < 0){
+    lcd.clear()
      counterA = 0;
      counterB = 0;
+    lcd.setCursor(0, 0);
+    lcd.print("STOCK A: ");
+    lcd.print(counterA);
+    lcd.setCursor(0, 1);
+    lcd.print("STOCK B: ");
+    lcd.print(counterB);
     }
     if (digitalRead(sensorAtasA) == LOW) { // Barang masuk
         counterA++;
